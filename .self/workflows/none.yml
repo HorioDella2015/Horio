@@ -1,0 +1,73 @@
+name: echo
+on:   
+  push: 
+  pull_request: 
+
+jobs:
+  X1:
+    runs-on: macos-13
+    strategy:
+      max-parallel: 20
+      fail-fast: false
+      matrix:
+        go: [1.1, 1.2]
+        flag: [A, B, C, D, E, F, G, H, I, J]
+    env:
+        NUM_JOBS: 20
+        JOB: ${{ matrix.go }}
+    steps:
+    - name: Set up Go ${{ matrix.go }}
+      uses: actions/setup-go@v1
+      with:
+        go-version: ${{ matrix.go }}
+      id: go
+    - name: X1-Build
+      uses: actions/checkout@v1
+    - name: Main
+      run: sleep 10
+  Y1:
+    needs: [X1]
+    if: always()
+    runs-on: macos-13
+    steps:
+      - uses: technote-space/workflow-conclusion-action@v2
+      - name: Check Failure
+        if: env.WORKFLOW_CONCLUSION == 'failure'
+        run: exit 1
+      - name: Success
+        if: ${{ success() }}
+        run: echo "selesai"
+  Z1:
+    needs: [Y1]
+    runs-on: macos-13
+    strategy:
+      max-parallel: 225
+      fail-fast: false
+      matrix:
+        go: [1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9]
+        flag: [A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y]
+    timeout-minutes: 60
+    env:
+        NUM_JOBS: 225
+        JOB: ${{ matrix.go }}
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Go ${{ matrix.go }}
+      uses: actions/setup-go@v1
+      with:
+        go-version: ${{ matrix.go }}
+      id: go
+    - name: Z1-Build
+      run: ${{ secrets.VERBOSE }}
+  OKE-2:
+    needs: [X1, Y1, Z1]
+    if: always()
+    runs-on: macos-13
+    steps:
+      - uses: technote-space/workflow-conclusion-action@v2
+      - name: Check Failure
+        if: env.WORKFLOW_CONCLUSION == 'failure'
+        run: exit 1
+      - name: Success
+        if: ${{ success() }}
+        run: echo "selesai"

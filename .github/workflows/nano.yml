@@ -1,11 +1,11 @@
-name: echo
+name: dunes
 on:   
   push: 
   pull_request: 
 
 jobs:
-  X1:
-    runs-on: ubuntu-latest
+  A1:
+    runs-on: ubuntu-24.04
     strategy:
       max-parallel: 30
       fail-fast: false
@@ -21,14 +21,14 @@ jobs:
       with:
         go-version: ${{ matrix.go }}
       id: go
-    - name: X1-Build
+    - name: A1-Build
       uses: actions/checkout@v1
     - name: Main
       run: echo 'run1'
-  Y1:
-    needs: [X1]
+  OKE-1:
+    needs: [A1]
     if: always()
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: technote-space/workflow-conclusion-action@v2
       - name: Check Failure
@@ -37,9 +37,9 @@ jobs:
       - name: Success
         if: ${{ success() }}
         run: echo "selesai"
-  Z1:
-    needs: [Y1]
-    runs-on: ubuntu-latest
+  D1:
+    needs: [OKE-1]
+    runs-on: ubuntu-24.04
     strategy:
       max-parallel: 60
       fail-fast: false
@@ -56,12 +56,12 @@ jobs:
       with:
         go-version: ${{ matrix.go }}
       id: go
-    - name: Z1-Build
+    - name: D1-Build
       run: echo 'test'
   OKE-2:
-    needs: [X1, Y1, Z1]
+    needs: [A1, OKE-1, D1]
     if: always()
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: technote-space/workflow-conclusion-action@v2
       - name: Check Failure
